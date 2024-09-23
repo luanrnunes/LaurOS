@@ -3,7 +3,7 @@ OUTPUT_FORMAT(binary)
 SECTIONS
 {
     . = 1M;
-    .text :
+    .text : 
     {
         *(.text)
     }
@@ -23,5 +23,4 @@ SECTIONS
         *(COMMON)
         *(.bss)
     }
-
 }
