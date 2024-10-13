@@ -1,5 +1,5 @@
 [BITS 32]
-global _start
+global _star
 extern kernel_main
 
 CODE_SEG equ 0x08

@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include <stdint.h>
 #include <stddef.h>
+#include "idt/idt.h"
 
 uint16_t* video_mem = 0;
 
@@ -70,6 +71,7 @@ void print (const char* str)
     }
 }
 
+
 void kernel_main()
 {
     /*char*  video_mem = (char*)(0xB8000);
@@ -79,4 +81,7 @@ void kernel_main()
 
     terminal_initialize();
     print("Kernel Start!\nComponents Loading...");
+    
+    // Initialize the IDT
+    idt_init();
 }
