@@ -20,6 +20,20 @@ _start:
     or al, 2
     out 0x92, al
 
+    ; remap the master Programable Interrupt Controller
+    mov al, 00010001b
+    out 0x20, al; tell master PIC
+
+    mov al, 0x20 ; Interrupt 0x20 is where master ISR should initialize
+    out 0x21, al
+
+    mov al, 00000001b
+    out 0x21, al
+    ; End of remap of the master PIC
+
+    ; enable interrupts
+    sti
+
     call kernel_main
     
     jmp $
