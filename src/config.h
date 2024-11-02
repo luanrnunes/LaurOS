@@ -6,4 +6,11 @@
 
 #define LAUROS_TOTAL_INTERRUPTS 512
 
+//100 MB heap. TODO: Make it dynamic accordingly to the available sys RAM
+
+#define LAUROS_HEAP_SIZE_BYTES 104857600
+#define LAUROS_HEAP_BLOCK_SIZE 4096
+#define LAUROS_HEAP_ADDRESS 0x01000000
+#define LAUROS_HEAP_TABLE_ADDRESS 0x00007E00
+
 #endif
