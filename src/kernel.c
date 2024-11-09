@@ -4,6 +4,7 @@
 #include "idt/idt.h"
 #include "io/io.h"
 #include "memory/heap/kheap.h"
+#include "memory/paging/paging.h"
 
 uint16_t* video_mem = 0;
 
@@ -73,6 +74,7 @@ void print (const char* str)
     }
 }
 
+static struct paging_4gb_chunk* kernel_chunk = 0;
 
 void kernel_main()
 {
@@ -82,7 +84,7 @@ void kernel_main()
     video_mem[1] = 2;*/
 
     terminal_initialize();
-    print("Kernel Start!\nComponents Loading...");
+    print("Kernel Initializing!\nComponents Loading...");
 
     // Initialize heap
     kheap_init();
@@ -90,5 +92,14 @@ void kernel_main()
     // Initialize the IDT
     idt_init();
 
+    //4GB paging enable
+    kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    //Swich to the kernel paging chunk
+    paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
+
+    // Enable paging
+    enable_paging();
+
+    //Sys interrupts
     enable_interrupts();
 }
