@@ -55,4 +55,84 @@ static const char* pathparser_get_path_part(const char** path)
         result_path_part = 0;
     }
 
+    return result_path_part;
+
+}
+
+struct path_part* pathparser_parse_path_part(struct path_part* lastPart, const char** path)
+{
+    const char* path_part_str = pathparser_get_path_part(path);
+    if(!path_part_str)
+    {
+        return 0;
+    }
+
+    struct path_part* part = kzalloc(sizeof(struct path_part));
+    part->part = path_part_str;
+    part->next = 0x00;
+
+    if(lastPart)
+    {
+        lastPart->next = part;
+    }
+
+    return part;
+}
+
+void pathparser_free(struct path_root* root)
+{
+    struct path_part* part = root->first;
+
+    while(part)
+    {
+        struct path_part* next_part = part->next;
+        kfree((void*) part->part);
+        kfree(part);
+        part = next_part;
+    }
+    kfree(root);
+    
+}
+
+struct path_root* pathparser_parse(const char* path, const char* current_dir_path)
+{
+    int res = 0;
+    const char* tmp_path = path;
+    struct path_root* path_root = 0;
+
+    if (strlen(path) > LAUROS_MAX_PATH)
+    {
+        goto out;
+    }
+
+    res = path_parser_get_drive_by_path(&tmp_path);
+
+    if(res < 0)
+    {
+        goto out;
+    }
+
+    path_root = pathparser_create_root(res);
+    if(!path_root)
+    {
+        goto out;
+    }
+
+    struct path_part* first_part = pathparser_parse_path_part(NULL, &tmp_path);
+
+    if(!first_part)
+    {
+        goto out;
+    }
+
+    path_root->first = first_part;
+    struct path_part* part = pathparser_parse_path_part(part, &tmp_path);
+    while(part)
+    {
+        part = pathparser_parse_path_part(part, &tmp_path);
+
+    }
+
+    out:
+    return path_root;
 }
