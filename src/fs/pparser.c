@@ -2,6 +2,7 @@
 #include "kernel.h"
 #include "string/string.h"
 #include "memory/heap/kheap.h"
+#include "memory/memory.h"
 #include "status.h"
 
 static int pathparser_path_valid_format(const char* filename)
@@ -17,7 +18,7 @@ static int pathparser_get_drive_by_path(const char** path)
         return -EBADPATH;
     }
 
-    int drive_number = tonumericdigit(*path[0]);
+    int drive_number = asciitonumeric(*path[0]);
 
     // 3 bytes to skip number
     *path += 3;;
@@ -39,14 +40,14 @@ static const char* pathparser_get_path_part(const char** path)
 
     while(**path != '/' && **path != 0x00)
     {
-        result_path_part[i] == **path;
+        result_path_part[i] = **path;
         *path += 1;
-        i++
+        i++;
     }
 
     if (**path == '/')
     {
-        *path + 1;
+        *path += 1;
     }
 
     if(i == 0)
@@ -105,7 +106,7 @@ struct path_root* pathparser_parse(const char* path, const char* current_dir_pat
         goto out;
     }
 
-    res = path_parser_get_drive_by_path(&tmp_path);
+    res = pathparser_get_drive_by_path(&tmp_path);
 
     if(res < 0)
     {
@@ -126,7 +127,7 @@ struct path_root* pathparser_parse(const char* path, const char* current_dir_pat
     }
 
     path_root->first = first_part;
-    struct path_part* part = pathparser_parse_path_part(part, &tmp_path);
+    struct path_part* part = pathparser_parse_path_part(first_part, &tmp_path);
     while(part)
     {
         part = pathparser_parse_path_part(part, &tmp_path);
